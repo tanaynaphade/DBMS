@@ -1,0 +1,47 @@
+CREATE TABLE student (
+    S_ID INT PRIMARY KEY,
+    name VARCHAR(50),
+    dept_name VARCHAR(50),
+    tot_cred INT
+);
+
+CREATE TABLE instructor (
+    T_ID INT PRIMARY KEY,
+    name VARCHAR(50),
+    dept_name VARCHAR(50),
+    salary DECIMAL(10, 2)
+);
+
+CREATE TABLE course (
+    course_id INT PRIMARY KEY,
+    title VARCHAR(100),
+    dept_name VARCHAR(50),
+    credits INT
+);
+
+1)
+SELECT dept_name, AVG(salary) AS avg_salary
+FROM instructor
+GROUP BY dept_name
+HAVING AVG(salary) > 42000;
+
+2)
+UPDATE instructor
+SET salary = salary * 1.10
+WHERE dept_name = 'Computer';
+
+3)
+SELECT name
+FROM instructor
+WHERE name NOT IN ('Amol', 'Amit');
+
+4)
+SELECT name
+FROM student
+WHERE name LIKE '%am%';
+
+5)
+SELECT student.name
+FROM student
+JOIN course ON student.dept_name = course.dept_name
+WHERE student.dept_name = 'Computer' AND course.title = 'DBMS';

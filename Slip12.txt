@@ -1,0 +1,36 @@
+CREATE TABLE Library (
+    book_id INT PRIMARY KEY,
+    title VARCHAR(100),
+    author VARCHAR(100),
+    published_date DATE,
+    quantity INT
+);
+
+CREATE TABLE Library_Audit (
+    book_id INT primary key,
+    title VARCHAR(100),
+    author VARCHAR(100),
+    published_date DATE,
+    quantity INT,
+    action VARCHAR(10), -- 'UPDATE' or 'DELETE'
+    action_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE TRIGGER After_library_update_or_delete
+AFTER UPDATE OR DELETE ON Library
+FOR EACH ROW
+DECLARE
+    action_type VARCHAR2(10);
+BEGIN
+    IF DELETING THEN
+        action_type := 'DELETE';
+    ELSIF UPDATING THEN
+        action_type := 'UPDATE';
+    END IF;
+
+    INSERT INTO Library_Audit (book_id, title, author, published_date, quantity, action, action_time)
+    VALUES (:OLD.book_id, :OLD.title, :OLD.author, :OLD.published_date, :OLD.quantity, action_type, CURRENT_TIMESTAMP);
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An error occurred in the trigger: ' || SQLERRM);
+END;

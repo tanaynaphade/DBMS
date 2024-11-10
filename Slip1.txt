@@ -1,0 +1,57 @@
+CREATE TABLE Customer (
+    C_Id INT PRIMARY KEY,
+    Cname VARCHAR(50),
+    City VARCHAR(50)
+);
+
+CREATE TABLE Account (
+    C_Id INT,
+    Acc_Type VARCHAR(20),
+    Amount INT,
+);
+
+1)
+SELECT Customer.Cname, Account.Acc_Type, Account.Amount 
+FROM Customer
+JOIN Account ON Customer.C_Id = Account.C_Id
+WHERE Account.Acc_Type = 'Saving';
+
+2)
+natural:
+SELECT * 
+FROM Customer NATURAL JOIN Account;
+
+left:
+SELECT Customer.*, Account.Acc_Type, Account.Amount
+FROM Customer
+LEFT JOIN Account ON Customer.C_Id = Account.C_Id;
+
+right:
+SELECT Customer.*, Account.Acc_Type, Account.Amount
+FROM Customer
+RIGHT JOIN Account ON Customer.C_Id = Account.C_Id;
+
+3)
+SELECT * 
+FROM Customer
+WHERE City = (SELECT City FROM Customer WHERE Cname = 'Pooja');
+
+4)
+SELECT * 
+FROM Account
+WHERE Amount < (SELECT AVG(Amount) FROM Account);
+
+5)
+SELECT C_Id
+FROM Account
+WHERE Amount = (SELECT MAX(Amount) FROM Account);
+
+6)
+SELECT Acc_Type, Amount 
+FROM Account
+WHERE Amount IN (SELECT MIN(Amount) FROM Account GROUP BY Acc_Type);
+
+7)
+SELECT Amount 
+FROM Account
+WHERE Amount > (SELECT MAX(Amount) FROM Account WHERE Acc_Type = 'Saving'); 

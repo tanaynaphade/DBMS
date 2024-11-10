@@ -1,0 +1,73 @@
+CREATE TABLE Empl (
+    e_no INT PRIMARY KEY,
+    e_name VARCHAR(100),
+    post VARCHAR(100),
+    pay_rate DECIMAL(10, 2)
+);
+
+CREATE TABLE Position_tbl (   -- Changed table name from 'Position' to 'Position_tbl'
+    pos_no INT PRIMARY KEY,
+    post VARCHAR(100)
+);
+
+CREATE TABLE Duty_alloc (
+    pos_no INT,
+    e_no INT,
+    month VARCHAR(20),
+    year INT,
+    shift INT,
+    FOREIGN KEY (pos_no) REFERENCES Position_tbl(pos_no),   -- Corrected table name here
+    FOREIGN KEY (e_no) REFERENCES Empl(e_no)
+);
+
+INSERT INTO Empl (e_no, e_name, post, pay_rate) VALUES
+(123, 'Amit', 'manager', 30000.00),
+(124, 'Sachin', 'developer', 25000.00),
+(125, 'Sneha', 'manager', 35000.00),
+(126, 'Pooja', 'tester', 20000.00),
+(127, 'Raj', 'developer', 22000.00);
+
+INSERT INTO Position_tbl (pos_no, post) VALUES
+(1, 'manager'),
+(2, 'developer'),
+(3, 'tester');
+
+INSERT INTO Duty_alloc (pos_no, e_no, month, year, shift) VALUES
+(1, 123, 'April', 2003, 1),   
+(1, 125, 'April', 2003, 2),   
+(2, 124, 'April', 2003, 1),   
+(2, 127, 'April', 2003, 2),   
+(3, 126, 'April', 2003, 1);   
+
+1)
+SELECT * 
+FROM Duty_alloc
+WHERE e_no = 123
+AND month = 'April'
+AND year = 2003
+AND shift = 1;
+
+2)
+SELECT * 
+FROM Empl
+WHERE pay_rate >= (
+    SELECT pay_rate FROM Empl WHERE e_name = 'Sachin'
+);
+
+3)
+CREATE VIEW post_salary_stats AS
+SELECT post, 
+       MIN(pay_rate) AS min_salary, 
+       MAX(pay_rate) AS max_salary, 
+       AVG(pay_rate) AS avg_salary
+FROM Empl
+GROUP BY post;
+
+SELECT * FROM post_salary_stats;
+
+4)
+SELECT shift, COUNT(DISTINCT da.e_no) AS employee_count
+FROM Duty_alloc da
+JOIN Empl e ON da.e_no = e.e_no
+WHERE e.post = 'manager'
+GROUP BY shift;

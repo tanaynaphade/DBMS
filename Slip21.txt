@@ -1,0 +1,47 @@
+db.orderinfo.insertMany([
+    { cust_id: 123, cust_name: "abc", status: "A", price: 250 },
+    { cust_id: 124, cust_name: "xyz", status: "B", price: 300 },
+    { cust_id: 125, cust_name: "def", status: "A", price: 450 },
+    { cust_id: 126, cust_name: "ghi", status: "C", price: 600 },
+    { cust_id: 127, cust_name: "jkl", status: "B", price: 350 }
+]);
+
+1)
+db.orderinfo.updateMany({}, { $set: { Age: 30 } });
+
+2)
+db.orderinfo.createIndex({ cust_name: 1, status: 1 });
+
+db.orderinfo.aggregate([
+    {
+        $group: {
+            _id: { cust_id: "$cust_id", status: "$status" },  // Group by cust_id and status
+            count: { $sum: 1 },  // Count occurrences
+            docs: { $push: "$_id" }  // Collect all document IDs
+        }
+    },
+    {
+        $match: {
+            count: { $gt: 1 }  // Only keep groups with more than one document
+        }
+    }
+]).forEach(function(group) {
+    group.docs.shift();  // Keep one document, remove others
+    db.orderinfo.deleteMany({ _id: { $in: group.docs } });  // Delete duplicate documents
+});
+
+3)
+db.orderinfo.aggregate([
+    {
+        $group: {
+            _id: "$status", 
+            averagePrice: { $avg: "$price" } 
+        }
+    }
+]);
+
+4)
+db.orderinfo.updateMany(
+    { status: "B" }, 
+    { $set: { cust_name: "Updated Name" } } 
+);

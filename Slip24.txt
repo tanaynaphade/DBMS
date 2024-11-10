@@ -1,0 +1,49 @@
+CREATE TABLE Emp (
+    emp_id INT PRIMARY KEY,
+    ename VARCHAR(100),
+    street VARCHAR(100),
+    city VARCHAR(100)
+);
+
+CREATE TABLE Works (
+    emp_id INT,
+    c_id INT,
+    ename VARCHAR(100),
+    cname VARCHAR(100),
+    sal DECIMAL(10, 2),
+    FOREIGN KEY (emp_id) REFERENCES Emp(emp_id)
+);
+
+CREATE TABLE Company (
+    c_id INT PRIMARY KEY,
+    cname VARCHAR(100),
+    city VARCHAR(100)
+);
+
+CREATE TABLE Manager (
+    mgr_id INT PRIMARY KEY,
+    mgrname VARCHAR(100)
+);
+
+1)
+UPDATE Company
+SET city = 'Pune'
+WHERE cname = 'ABC';
+
+2)
+UPDATE Works
+SET sal = CASE
+    WHEN sal > 20000 THEN sal * 1.03
+    ELSE sal * 1.10
+END
+WHERE cname = 'Mbank';
+
+3)
+SELECT ename
+FROM Works w
+JOIN Company c ON w.c_id = c.c_id
+WHERE c.cname = 'Bosch' AND c.city = 'Pune';
+
+4)
+DELETE FROM Works
+WHERE cname = 'SBC' AND sal > 50000;

@@ -1,0 +1,51 @@
+CREATE TABLE teaches (
+    T_ID INT,
+    course_id INT,
+    sec_id INT,
+    semester VARCHAR(10),
+    year INT,
+    PRIMARY KEY (T_ID, course_id, sec_id, semester, year)
+);
+
+CREATE TABLE student (
+    S_ID INT PRIMARY KEY,
+    name VARCHAR(50),
+    dept_name VARCHAR(50),
+    tot_cred INT
+);
+
+CREATE TABLE instructor (
+    T_ID INT PRIMARY KEY,
+    name VARCHAR(50),
+    dept_name VARCHAR(50),
+    salary DECIMAL(10, 2)
+);
+
+CREATE TABLE course (
+    course_id INT PRIMARY KEY,
+    title VARCHAR(100),
+    dept_name VARCHAR(50),
+    credits INT
+);
+
+1)
+SELECT instructor.name, teaches.semester, teaches.year, course.title
+FROM instructor
+JOIN teaches ON instructor.T_ID = teaches.T_ID
+JOIN course ON teaches.course_id = course.course_id
+ORDER BY teaches.semester, teaches.year;
+
+2)
+CREATE VIEW student_view AS
+SELECT S_ID, name, dept_name, tot_cred
+FROM student;
+
+-- To select from the view
+SELECT * FROM student_view;
+
+3)
+ALTER TABLE student CHANGE dept_name department_name VARCHAR(50);
+
+4)
+DELETE FROM student
+WHERE dept_name IS NULL;

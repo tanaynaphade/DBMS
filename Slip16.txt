@@ -1,0 +1,49 @@
+1)
+use department;
+
+2)
+db.createCollection("teacher");
+
+db.teacher.insertMany([
+    { name: "Alice", department: "Math", experience: 5, salary: 60000 },
+    { name: "Bob", department: "Science", experience: 3, salary: 55000 },
+    { name: "Charlie", department: "Math", experience: 8, salary: 70000 },
+    { name: "David", department: "History", experience: 4, salary: 45000 },
+    { name: "Eve", department: "Science", experience: 6, salary: 80000 },
+    { name: "Frank", department: "Math", experience: 2, salary: 50000 },
+    { name: "Grace", department: "History", experience: 7, salary: 60000 },
+    { name: "Hank", department: "Science", experience: 1, salary: 40000 }
+]);
+
+3)
+db.teacher.aggregate([
+    {
+        $group: {
+            _id: "$department",
+            averageSalary: { $avg: "$salary" }
+        }
+    }
+]);
+
+4)
+db.teacher.aggregate([
+    {
+        $group: {
+            _id: "$department",
+            employeeCount: { $sum: 1 }
+        }
+    }
+]);
+
+5)
+db.teacher.aggregate([
+    {
+        $group: {
+            _id: "$department",
+            minimumSalary: { $min: "$salary" }
+        }
+    }
+]);
+
+6)
+db.teacher.createIndex({ department: 1 }); 

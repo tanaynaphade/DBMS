@@ -1,0 +1,105 @@
+CREATE TABLE Account (
+    Acc_no INT PRIMARY KEY,
+    branch_name VARCHAR(50),
+    balance DECIMAL(15, 2) CHECK (balance >= 0),
+    FOREIGN KEY (branch_name) REFERENCES branch(branch_name)
+);
+
+CREATE TABLE branch (
+    branch_name VARCHAR(50) PRIMARY KEY,
+    branch_city VARCHAR(50) NOT NULL,
+    assets DECIMAL(15, 2) CHECK (assets >= 0)
+);
+
+CREATE TABLE customer (
+    cust_name VARCHAR(50),
+    cust_street VARCHAR(100) NOT NULL,
+    cust_city VARCHAR(50) NOT NULL,
+    PRIMARY KEY (cust_name)
+);
+
+CREATE TABLE Depositor (
+    cust_name VARCHAR(50),
+    acc_no INT,
+    PRIMARY KEY (cust_name, acc_no),
+    FOREIGN KEY (cust_name) REFERENCES customer(cust_name),
+    FOREIGN KEY (acc_no) REFERENCES Account(Acc_no)
+);
+
+CREATE TABLE Loan (
+    loan_no INT PRIMARY KEY,
+    branch_name VARCHAR(50),
+    amount DECIMAL(15, 2) CHECK (amount > 0),
+    FOREIGN KEY (branch_name) REFERENCES branch(branch_name)
+);
+
+CREATE TABLE Borrower (
+    cust_name VARCHAR(50),
+    loan_no INT,
+    PRIMARY KEY (cust_name, loan_no),
+    FOREIGN KEY (cust_name) REFERENCES customer(cust_name),
+    FOREIGN KEY (loan_no) REFERENCES Loan(loan_no)
+);
+
+1)
+SELECT DISTINCT branch_name FROM Loan;
+
+2)
+SELECT loan_no FROM Loan
+WHERE branch_name = 'Akurdi' AND amount > 12000;
+
+3)
+SELECT c.cust_name, l.loan_no, l.amount
+FROM customer c
+JOIN Borrower b ON c.cust_name = b.cust_name
+JOIN Loan l ON b.loan_no = l.loan_no;
+
+4)
+SELECT c.cust_name
+FROM customer c
+JOIN Borrower b ON c.cust_name = b.cust_name
+JOIN Loan l ON b.loan_no = l.loan_no
+WHERE l.branch_name = 'Akurdi'
+ORDER BY c.cust_name;
+
+5)
+SELECT DISTINCT c.cust_name
+FROM customer c
+LEFT JOIN Depositor d ON c.cust_name = d.cust_name
+LEFT JOIN Borrower b ON c.cust_name = b.cust_name
+WHERE d.cust_name IS NOT NULL OR b.cust_name IS NOT NULL;
+
+6)
+SELECT DISTINCT c.cust_name
+FROM customer c
+JOIN Depositor d ON c.cust_name = d.cust_name
+JOIN Borrower b ON c.cust_name = b.cust_name;
+
+7)
+SELECT DISTINCT c.cust_name
+FROM customer c
+JOIN Depositor d ON c.cust_name = d.cust_name
+LEFT JOIN Borrower b ON c.cust_name = b.cust_name
+WHERE b.cust_name IS NULL;
+
+8)
+SELECT AVG(balance) AS avg_balance
+FROM Account
+WHERE branch_name = 'Akurdi';
+
+9)
+SELECT branch_name, AVG(balance) AS avg_balance
+FROM Account
+GROUP BY branch_name;
+
+10)
+SELECT a.branch_name, COUNT(DISTINCT d.cust_name) AS num_depositors
+FROM Account a
+JOIN Depositor d ON a.Acc_no = d.acc_no
+GROUP BY a.branch_name;
+
+11)
+SELECT branch_name
+FROM Account
+GROUP BY branch_name
+HAVING AVG(balance) > 12000;

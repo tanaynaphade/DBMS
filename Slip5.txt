@@ -1,0 +1,28 @@
+DECLARE
+    CURSOR c_new_rollcall IS
+        SELECT RollNo, Name, Attendance FROM N_RollCall;
+   
+    v_exists NUMBER;
+   
+BEGIN
+    FOR rec IN c_new_rollcall LOOP
+        SELECT COUNT(*) INTO v_exists
+        FROM O_RollCall
+        WHERE RollNo = rec.RollNo;
+       
+        IF v_exists = 0 THEN
+            INSERT INTO O_RollCall (RollNo, Name, Attendance)
+            VALUES (rec.RollNo, rec.Name, rec.Attendance);
+            DBMS_OUTPUT.PUT_LINE('Inserted: ' || rec.RollNo || ', ' || rec.Name);
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Skipped (already exists): ' || rec.RollNo);
+        END IF;
+    END LOOP;
+   
+    COMMIT;
+   
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+        ROLLBACK;
+END;

@@ -1,0 +1,81 @@
+CREATE TABLE ACTOR (
+    Act_id INT PRIMARY KEY,
+    Act_Name VARCHAR(100) NOT NULL,
+    Act_Gender CHAR(1) CHECK (Act_Gender IN ('M', 'F'))
+);
+
+CREATE TABLE DIRECTOR (
+    Dir_id INT PRIMARY KEY,
+    Dir_Name VARCHAR(100) NOT NULL,
+    Dir_Phone VARCHAR(15)
+);
+
+CREATE TABLE MOVIES (
+    Mov_id INT PRIMARY KEY,
+    Mov_Title VARCHAR(100) NOT NULL,
+    Mov_Year INT CHECK (Mov_Year > 1800 AND Mov_Year <= YEAR(CURDATE())),
+    Mov_Lang VARCHAR(50),
+    Dir_id INT,
+    FOREIGN KEY (Dir_id) REFERENCES DIRECTOR(Dir_id)
+);
+
+CREATE TABLE MOVIE_CAST (
+    Act_id INT,
+    Mov_id INT,
+    Role VARCHAR(50),
+    PRIMARY KEY (Act_id, Mov_id),
+    FOREIGN KEY (Act_id) REFERENCES ACTOR(Act_id),
+    FOREIGN KEY (Mov_id) REFERENCES MOVIES(Mov_id)
+);
+
+CREATE TABLE RATING (
+    Mov_id INT,
+    Rev_Stars INT CHECK (Rev_Stars BETWEEN 1 AND 5),
+    FOREIGN KEY (Mov_id) REFERENCES MOVIES(Mov_id)
+);
+
+1)
+SELECT Mov_Title
+FROM MOVIES
+JOIN DIRECTOR ON MOVIES.Dir_id = DIRECTOR.Dir_id
+WHERE Dir_Name = 'Hitchcock';
+
+2)
+SELECT Mov_Title
+FROM MOVIES
+JOIN MOVIE_CAST ON MOVIES.Mov_id = MOVIE_CAST.Mov_id
+WHERE Act_id IN (
+    SELECT Act_id
+    FROM MOVIE_CAST
+    GROUP BY Act_id
+    HAVING COUNT(DISTINCT Mov_id) >= 2
+);
+
+3)
+SELECT DISTINCT ACTOR.Act_Name
+FROM ACTOR
+JOIN MOVIE_CAST ON ACTOR.Act_id = MOVIE_CAST.Act_id
+JOIN MOVIES ON MOVIE_CAST.Mov_id = MOVIES.Mov_id
+WHERE MOVIES.Mov_Year < 2000
+AND ACTOR.Act_id IN (
+    SELECT Act_id
+    FROM MOVIE_CAST
+    JOIN MOVIES ON MOVIE_CAST.Mov_id = MOVIES.Mov_id
+    WHERE MOVIES.Mov_Year > 2015
+);
+
+4)
+SELECT Mov_Title, Rev_Stars
+FROM MOVIES
+JOIN RATING ON MOVIES.Mov_id = RATING.Mov_id
+ORDER BY Mov_Title;
+
+5)
+UPDATE RATING
+SET Rev_Stars = 5
+WHERE Mov_id IN (
+    SELECT Mov_id
+    FROM MOVIES
+    JOIN DIRECTOR ON MOVIES.Dir_id = DIRECTOR.Dir_id
+    WHERE Dir_Name = 'Steven Spielberg'
+);

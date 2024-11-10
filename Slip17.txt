@@ -1,0 +1,56 @@
+CREATE TABLE Employee (
+    Eid INT,
+    EName VARCHAR(50),
+    Address VARCHAR(50),
+    Salary INT,
+    Commission INT
+);
+
+CREATE TABLE Project (
+    PNo INT,
+    Addr VARCHAR(50)
+);
+
+1)
+SELECT DISTINCT Address FROM Employee;
+
+2)
+SELECT MAX(Salary) AS Max_Salary, MIN(Salary) AS Min_Salary FROM Employee;
+
+3)
+SELECT * FROM Employee ORDER BY Salary ASC;
+
+4)
+SELECT EName FROM Employee WHERE Address IN ('Nasik', 'Pune');
+
+5)
+SELECT EName FROM Employee WHERE Commission IS NULL;
+
+6)
+UPDATE Employee SET Address = 'Nasik' WHERE EName = 'Amit';
+
+7)
+SELECT * FROM Employee WHERE EName LIKE 'A%';
+
+8)
+SELECT COUNT(*) FROM Employee WHERE Address = 'Mumbai';
+
+9)
+SELECT Address, COUNT(*) AS Staff_Count FROM Employee GROUP BY Address;
+
+10)
+SELECT DISTINCT Address FROM Employee
+UNION
+SELECT DISTINCT Addr FROM Project;
+
+11)
+SELECT Address, MIN(Salary) AS Min_Salary FROM Employee GROUP BY Address;
+
+12)
+SELECT Address, MAX(Salary) AS Max_Salary 
+FROM Employee 
+GROUP BY Address
+HAVING MAX(Salary) > 26000;
+
+13)
+DELETE FROM Employee WHERE Salary > 30000;

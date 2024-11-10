@@ -1,0 +1,65 @@
+use Location;
+
+db.city.insertMany([
+    { city: "Pune", type: "urban", state: "MH", population: "5600000" },
+    { city: "Mumbai", type: "urban", state: "MH", population: "12478447" },
+    { city: "Nagpur", type: "urban", state: "MH", population: "2405665" },
+    { city: "Aurangabad", type: "urban", state: "MH", population: "1174576" },
+    { city: "Nashik", type: "urban", state: "MH", population: "1800000" },
+    { city: "Akola", type: "urban", state: "MH", population: "500000" },
+    { city: "Bangalore", type: "urban", state: "KA", population: "8436675" },
+    { city: "Mysore", type: "urban", state: "KA", population: "987000" },
+    { city: "Delhi", type: "urban", state: "DL", population: "16787941" },
+    { city: "Hyderabad", type: "urban", state: "TG", population: "6800000" }
+]);
+
+1)
+var mapState = function() {
+    emit(this.state, parseInt(this.population));
+};
+
+var reduceState = function(key, values) {
+    return Array.sum(values);
+};
+
+db.city.mapReduce(
+    mapState,
+    reduceState,
+    { out: "statewise_population" }
+);
+
+db.statewise_population.find();
+
+2)
+var mapCity = function() {
+    emit(this.city, parseInt(this.population));
+};
+
+var reduceCity = function(key, values) {
+    return Array.sum(values);
+};
+
+db.city.mapReduce(
+    mapCity,
+    reduceCity,
+    { out: "citywise_population" }
+);
+
+db.citywise_population.find();
+
+3)
+var mapType = function() {
+    emit(this.type, parseInt(this.population));
+};
+
+var reduceType = function(key, values) {
+    return Array.sum(values);
+};
+
+db.city.mapReduce(
+    mapType,
+    reduceType,
+    { out: "typewise_population" }
+);
+
+db.typewise_population.find();

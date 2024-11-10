@@ -1,0 +1,28 @@
+CREATE OR REPLACE FUNCTION FUNCTION1 RETURN VARCHAR2 AS
+PRAGMA autonomous_transaction;
+CURSOR c1 IS SELECT NAME, ROLL_NO, MARKS FROM STUD_MARK2;
+rno NUMBER;
+nm VARCHAR2(20);
+mrk NUMBER;
+BEGIN
+    OPEN c1;
+    LOOP 
+        FETCH c1 INTO nm, rno, mrk;
+        EXIT WHEN c1%NOTFOUND;
+        IF (mrk <= 1500 AND mrk >= 990) THEN
+            INSERT INTO RESULT VALUES (rno, nm, 'DISTINCTION');
+        ELSIF (mrk <= 989 AND mrk >= 900) THEN
+            INSERT INTO RESULT VALUES (rno, nm, 'First Class');
+        ELSIF (mrk <= 899 AND mrk >= 825) THEN
+            INSERT INTO RESULT VALUES (rno, nm, 'Higher Second Class');
+        ELSE
+            INSERT INTO RESULT VALUES (rno, nm, 'Fail');
+        END IF;
+    END LOOP;
+    CLOSE c1;
+    COMMIT;
+    RETURN NULL;
+EXCEPTION 
+    WHEN OTHERS THEN
+        ROLLBACK;
+END FUNCTION1;

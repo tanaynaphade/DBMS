@@ -1,0 +1,22 @@
+CREATE OR REPLACE PROCEDURE proc_Grade (
+    p_roll_number IN NUMBER,
+    p_name IN VARCHAR2,
+    p_marks IN NUMBER
+) AS
+    v_class VARCHAR2(50);
+BEGIN
+    IF p_marks >= 990 AND p_marks <= 1500 THEN
+        v_class := 'Distinction';
+    ELSIF p_marks >= 900 AND p_marks <= 989 THEN
+        v_class := 'First Class';
+    ELSIF p_marks >= 825 AND p_marks <= 899 THEN
+        v_class := 'Higher Second Class';
+    ELSE
+        v_class := 'Unclassified';
+    END IF;
+
+    INSERT INTO Result (roll_number, name, class)
+    VALUES (p_roll_number, p_name, v_class);
+   
+    COMMIT;
+END;

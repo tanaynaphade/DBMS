@@ -1,0 +1,51 @@
+DECLARE
+    v_roll_no VARCHAR2(10);
+    v_name_of_book VARCHAR2(100);
+    v_date_of_issue DATE;
+    v_status CHAR(1);
+    v_days NUMBER;
+    v_fine_amt NUMBER := 0;
+
+    e_no_data_found EXCEPTION;
+    e_invalid_status EXCEPTION;
+
+BEGIN
+    v_roll_no := '&roll_no';
+    v_name_of_book := '&name_of_book';
+
+    SELECT DOI, STATUS INTO v_date_of_issue, v_status
+    FROM Borrower
+    WHERE Roll_NO = v_roll_no AND NOB = v_name_of_book;
+
+    IF v_status = 'R' THEN
+        RAISE e_invalid_status;
+    END IF;
+
+    v_days := TRUNC(SYSDATE - v_date_of_issue);
+
+    IF v_days > 15 THEN
+        IF v_days <= 30 THEN
+            v_fine_amt := (v_days - 15) * 5;
+        ELSE
+            v_fine_amt := 15 * 5 + (v_days - 30) * 50;
+        END IF;
+
+        INSERT INTO Fine (RollNO, DOI, AMT) VALUES (v_roll_no, SYSDATE, v_fine_amt);
+    END IF;
+
+    UPDATE Borrower
+    SET Status = 'R'
+    WHERE ROLL_NO = v_roll_no AND NOB = v_name_of_book;
+
+    COMMIT;
+
+    DBMS_OUTPUT.PUT_LINE('Book returned successfully. Fine Amount: ' || v_fine_amt);
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Error: No record found for the provided roll number and book.');
+    WHEN e_invalid_status THEN
+        DBMS_OUTPUT.PUT_LINE('Error: Book is already returned.');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An unexpected error occurred: ' || SQLERRM);
+END;
